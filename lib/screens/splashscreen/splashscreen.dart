@@ -1,47 +1,46 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:rider/screens/home/home.dart';
 import 'package:rider/screens/login/login.dart';
 import 'package:rider/utils/color.dart';
 import 'package:rider/utils/image.dart';
 import 'package:rider/utils/text.dart';
-
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: SplashScreen(),
-      // home: MyNavigationBar(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
-}
-
+import 'package:shared_preferences/shared_preferences.dart';
 class SplashScreen extends StatefulWidget {
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
-
 class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
     Timer(
       Duration(seconds: 1),
-      () => Navigator.of(context).pushReplacement(
-        MaterialPageRoute(
-          builder: (BuildContext context) => LoginScreen(),
-          // builder: (BuildContext context) => FetchStatus(),
-        ),
-      ),
+      () => checkLogin(),
     );
   }
-
+  void checkLogin() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    if (isLoggedIn) {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) => HomeScreen(),
+        ),
+      );
+    } else {
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          builder: (BuildContext context) => LoginScreen(),
+        ),
+      );
+    }
+  }
   @override
   Widget build(BuildContext context) {
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
-
     return Scaffold(
       backgroundColor: RColor.gray,
       body: Column(
@@ -54,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 bottomRight: Radius.circular(45),
               ),
             ),
-            height: screenHeight * 0.3, // Adjusted using media query
+            height: screenHeight * 0.3,
             width: screenWidth,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -63,8 +62,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 SizedBox(height: 1),
                 Image.asset(
                   RImage.SplashScreen,
-                  width: screenWidth * 0.5, // Adjusted using media query
-                  height: screenHeight * 0.1, // Adjusted using media query
+                  width: screenWidth * 0.5,
+                  height: screenHeight * 0.1,
                 ),
                 SizedBox(height: 20),
                 Text(
@@ -82,18 +81,15 @@ class _SplashScreenState extends State<SplashScreen> {
                     fontWeight: FontWeight.bold,
                     color: RColor.accent,
                   )
-                    
                 ),
               ],
             ),
           ),
-          SizedBox(
-            height: 20,
-          ),
+          SizedBox(height: 20),
           Padding(
             padding: EdgeInsets.only(right: screenWidth * 0.25),
             child: Container(
-              height: screenHeight * 0.5, // Adjusted using media query
+              height: screenHeight * 0.5,
               child: Image.asset(
                 RImage.SplashScreen1,
                 height: screenHeight * 0.5,

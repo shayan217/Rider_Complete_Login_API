@@ -47,6 +47,7 @@ dependencies:
   simple_barcode_scanner: ^0.1.0
   camera: ^0.10.5+9
   http: ^1.2.0
+  shared_preferences: ^2.2.2
 
 dev_dependencies:
   flutter_test:

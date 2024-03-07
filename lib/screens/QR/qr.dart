@@ -1,41 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'package:http/http.dart' as http;
 import 'package:rider/screens/Drawer/drawer.dart';
 import 'package:rider/screens/QR/qr_scann_functionality.dart';
-import 'package:rider/screens/custom_navigation/custom_navigation.dart';
-import 'package:rider/screens/home/navigation_controller.dart';
 import 'package:rider/utils/color.dart';
+import 'dart:convert';
 import 'package:rider/utils/image.dart';
-
 class QRController extends GetxController {
-  final scannedResults = <String>[].obs;
-
-  void addScannedResult(String result) {
-    scannedResults.add(result);
-  }
-
-  void deleteResult(int index) {
-    scannedResults.removeAt(index);
+  // final scannedResults = List<Map<String, dynamic>>().obs;
+  final scannedResults = <Map<String, dynamic>>[].obs;
+  Future<void> fetchDataFromAPI(String masterNo) async {
+    try {
+      var headers = {
+        'Ridername': 'zainKhan',
+        'Riderpassword': 'demo@1234',
+        'Content-Type': 'application/json',
+        'Cookie': 'PHPSESSID=fc5f9fd74d1006552eb94b08ea7dc0c1'
+      };
+      var requestBody = json.encode({"master_no": masterNo});
+      var response = await http.post(Uri.parse('https://falcon.onelogitech.com/api/riderapp_loadsheet'), headers: headers, body: requestBody);
+      if (response.statusCode == 200) {
+        var jsonResponse = json.decode(response.body);
+        var body = jsonResponse['data']['body'];
+        if (body != null && body is List) {
+          scannedResults.assignAll(body.cast<Map<String, dynamic>>());
+        }
+      } else {
+        print('Request failed with status: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Exception thrown: $e');
+    }
   }
 }
-
 class QRScreen extends StatefulWidget {
   @override
   _QRScreenState createState() => _QRScreenState();
 }
-
 class _QRScreenState extends State<QRScreen> {
-  final NavigationController _controller = Get.put(NavigationController());
-
-  late QRController qrController;
-
+  final QRController qrController = Get.put(QRController());
   @override
   void initState() {
     super.initState();
-    qrController = Get.put(QRController());
+    qrController.fetchDataFromAPI("1");
   }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,6 +55,18 @@ class _QRScreenState extends State<QRScreen> {
         ),
         title: Text("Scan QR Code"),
         actions: [
+          GestureDetector(
+            onTap: (){
+              Get.to(CameraScreen());
+            },
+            child:  Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Image.asset(
+                RImage.MainQR,
+                height: 32,
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: () {
               Get.to(NewD());
@@ -64,65 +84,39 @@ class _QRScreenState extends State<QRScreen> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 120,
-          ),
-          Image.asset(
-            RImage.MainQR,
-          ),
-          SizedBox(
-            height: 15,
-          ),
-          SizedBox(
-            width: 215,
-            child: ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CameraScreen()),
-                ).then((value) {
-                  if (value != null && value is String) {
-                    qrController.addScannedResult(value);
-                  }
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: RColor.pink,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6.0),
-                ),
-              ),
-              child: Text(
-                'Scan QR Code',
-                style: GoogleFonts.montserrat(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: RColor.accent,
-                ),
-              ),
-            ),
-          ),
-            SizedBox(height: 5,),
+          SizedBox(height: 5,),
           Expanded(
             child: Obx(
               () => ListView.builder(
                 itemCount: qrController.scannedResults.length,
                 itemBuilder: (context, index) {
+                  var data = qrController.scannedResults[index];
                   return Card(
-                    color: RColor.gray,
+                    color: Colors.grey,
                     margin: EdgeInsets.symmetric(
                         horizontal: 18.0,
-                        vertical: 5.0), // Add margin for better spacing
+                        vertical: 5.0),
                     child: SizedBox(
-                      // Wrap Card with SizedBox to set its width
-                      width: MediaQuery.of(context).size.width *
-                          0.9, // Adjust the width as needed
+                      width: MediaQuery.of(context).size.width * 0.9,
                       child: ListTile(
-                        title: Text(qrController.scannedResults[index]),
+                        title: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Master No: ${data['master_no']}"),
+                            Text("Shipment No: ${data['shipment_no']}"),
+                            Text("Shipment Date: ${data['shipment_date']}"),
+                            Text("Consignee Name: ${data['consignee_name']}"),
+                            Text("Consignee Address: ${data['consignee_address']}"),
+                            Text("Cash Collect: ${data['cash_collect']}"),
+                            Text("Consignee Contact: ${data['consignee_contact']}"),
+                            Text("Account Number: ${data['account_number']}"),
+                          ],
+                        ),
                         trailing: IconButton(
-                          icon: Icon(Icons.delete),color: RColor.pink,
+                          icon: Icon(Icons.delete),
+                          color: Colors.pink,
                           onPressed: () {
-                            qrController.deleteResult(index);
+                            qrController.scannedResults.removeAt(index);
                           },
                         ),
                       ),
@@ -132,40 +126,19 @@ class _QRScreenState extends State<QRScreen> {
               ),
             ),
           ),
-
-          // Add your image here
-          // Image.asset(
-          //   RImage.MainQR,
-
-          // ),
         ],
       ),
-      bottomNavigationBar: CustomNavigationBar(
-        onTabSelected: _controller.changePage,
-        selectedIndex: _controller.selectedIndex.value,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // Refresh data when fab is pressed
+          qrController.fetchDataFromAPI("1"); // You can pass the desired master number here
+        },
+        child: Icon(Icons.refresh),
       ),
-      floatingActionButton: SizedBox(
-        width: 70, // Adjust width as needed
-        height: 70, // Adjust height as needed
-        child: ClipRRect(
-          borderRadius:
-              BorderRadius.circular(100.0), // Adjust the value as needed
-          child: FloatingActionButton(
-            onPressed: () {
-              Navigator.push(
-                  context, MaterialPageRoute(builder: (context) => QRScreen()));
-            },
-            child: Image.asset(
-              RImage.QR,
-              cacheHeight: 70,
-              cacheWidth: 70,
-            ),
-            shape: CircleBorder(),
-            backgroundColor: RColor.pink,
-          ),
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }
+
+
+
+///////////API complete code////////////

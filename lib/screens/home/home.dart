@@ -7,6 +7,7 @@ import 'package:rider/screens/all_widgets/circle_progressindicator.dart';
 import 'package:rider/screens/custom_navigation/custom_navigation.dart';
 import 'package:rider/screens/home/navigation_controller.dart';
 import 'package:rider/screens/home/select_date_widget.dart';
+import 'package:rider/screens/reattempt/reattempt.dart';
 import 'package:rider/utils/color.dart';
 import 'package:rider/utils/image.dart';
 
@@ -31,7 +32,7 @@ class HomeScreen extends StatelessWidget {
             Spacer(),
             GestureDetector(
               onTap: () {
-               Get.to(NewD());
+                Get.to(NewD());
               },
               child: Image.asset(
                 RImage.Menu,
@@ -56,46 +57,46 @@ class HomeScreen extends StatelessWidget {
               ),
               SizedBox(height: 20),
               GetBuilder<NavigationController>(
-                builder: (controller) =>  Container(
-                width: 350,
-                height: 60,
-                child: Obx(
-                  () => ElevatedButton(
-                    onPressed: () {
-                      controller.isOffRoute.toggle();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: controller.isOffRoute.isTrue
-                          ? RColor.pink
-                          : RColor.graish,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                builder: (controller) => Container(
+                  width: 350,
+                  height: 60,
+                  child: Obx(
+                    () => ElevatedButton(
+                      onPressed: () {
+                        controller.isOffRoute.toggle();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: controller.isOffRoute.isTrue
+                            ? RColor.pink
+                            : RColor.graish,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(15.0),
-                      child: Obx(
-                        () => Text(
-                          controller.isOffRoute.isTrue
-                              ? 'On Route'
-                              : 'OFF Route',
-                          style: controller.isOffRoute.isTrue
-                              ? GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                  color: Colors.white,
-                                )
-                              : GoogleFonts.montserrat(
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 18,
-                                  color: RColor.secondary,
-                                ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(15.0),
+                        child: Obx(
+                          () => Text(
+                            controller.isOffRoute.isTrue
+                                ? 'On Route'
+                                : 'OFF Route',
+                            style: controller.isOffRoute.isTrue
+                                ? GoogleFonts.montserrat(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18,
+                                    color: Colors.white,
+                                  )
+                                : GoogleFonts.montserrat(
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18,
+                                    color: RColor.secondary,
+                                  ),
+                          ),
                         ),
                       ),
                     ),
                   ),
                 ),
-              ),
               ),
               SizedBox(height: 25),
               Row(
@@ -159,28 +160,28 @@ class HomeScreen extends StatelessWidget {
         onTabSelected: _controller.changePage,
         selectedIndex: _controller.selectedIndex.value,
       ),
-     floatingActionButton: SizedBox(
-  width: 70, // Adjust width as needed
-  height: 70, // Adjust height as needed
-  child: ClipRRect(
-    borderRadius: BorderRadius.circular(100.0), // Adjust the value as needed
-    child: FloatingActionButton(
-      onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context) => QRScreen()));
-      },
-      child: Image.asset(
-        RImage.QR,
-        cacheHeight: 70,
-        cacheWidth: 70,
+      floatingActionButton: SizedBox(
+        width: 70, // Adjust width as needed
+        height: 70, // Adjust height as needed
+        child: ClipRRect(
+          borderRadius:
+              BorderRadius.circular(100.0), // Adjust the value as needed
+          child: FloatingActionButton(
+            onPressed: () {
+              Navigator.push(
+                  context, MaterialPageRoute(builder: (context) => QRScreen()));
+            },
+            child: Image.asset(
+              RImage.QR,
+              cacheHeight: 70,
+              cacheWidth: 70,
+            ),
+            shape: CircleBorder(),
+            backgroundColor: RColor.pink,
+          ),
+        ),
       ),
-      shape: CircleBorder(),
-      backgroundColor: RColor.pink,
-    ),
-  ),
-),
-floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-
-
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 }

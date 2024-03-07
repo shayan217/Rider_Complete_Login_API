@@ -1,25 +1,19 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:http/http.dart' as http;
 import 'package:rider/screens/fogot_password/forgot_password.dart';
-import 'package:rider/screens/home/home.dart';
 import 'package:rider/screens/login/controller/controller.dart';
-import 'package:rider/screens/login/sign_up.dart';
+import 'package:rider/screens/signup/sign_up.dart';
 import 'package:rider/utils/color.dart';
-
 class LoginScreen extends StatefulWidget {
   @override
   _LoginScreenState createState() => _LoginScreenState();
 }
-
 class _LoginScreenState extends State<LoginScreen> {
   bool isPasswordVisible = false;
   final LoginController loginController = Get.put(LoginController());
   TextEditingController riderNameController = TextEditingController();
   TextEditingController riderPasswordController = TextEditingController();
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

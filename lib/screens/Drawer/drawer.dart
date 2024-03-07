@@ -6,10 +6,16 @@ import 'package:rider/screens/fogot_password/change_password.dart';
 import 'package:rider/screens/login/login.dart';
 import 'package:rider/utils/color.dart';
 import 'package:rider/utils/image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class NewD extends StatelessWidget {
-  const NewD({Key? key}) : super(key: key);
+  Future<void> logout() async {
+    // Clear login status in shared preferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', false);
+  }
 
+  const NewD({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -20,7 +26,7 @@ class NewD extends StatelessWidget {
         actions: [
           IconButton(
             onPressed: () {
-             Get.back();
+              Get.back();
             },
             icon: Icon(Icons.close),
           ),
@@ -64,7 +70,6 @@ class NewD extends StatelessWidget {
                           SizedBox(
                             height: 50,
                           ),
-
                           Divider(
                             thickness: 1,
                             indent: 20,
@@ -117,7 +122,11 @@ class NewD extends StatelessWidget {
                                 ),
                                 GestureDetector(
                                   onTap: () {
-                                    Navigator.push(context, MaterialPageRoute(builder: (context) => ChangePasswordS()));
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                ChangePasswordS()));
                                   },
                                   child: ListTile(
                                     leading: Image.asset(RImage.Dr3),
@@ -164,16 +173,13 @@ class NewD extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        child: GestureDetector(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => LoginScreen()),
-            );
-          },
-          child: Image.asset(RImage.Down),
-        ),
+        onPressed: () async {
+          // Perform logout action
+          await logout();
+          // Navigate to the login screen using GetX
+          Get.offAll(LoginScreen());
+        },
+        child: Image.asset(RImage.Down),
         backgroundColor: Colors.white,
         shape: CircleBorder(),
       ),
